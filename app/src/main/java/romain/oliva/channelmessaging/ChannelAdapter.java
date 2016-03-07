@@ -11,26 +11,40 @@ import java.util.ArrayList;
 
 import romain.oliva.channelmessaging.gson.Channel;
 
-/**
- * Created by RomainMac on 08/02/2016.
- */
+
 public class ChannelAdapter extends BaseAdapter {
     private final Context context;
     ArrayList<Channel> allChannels;
+    ArrayList<Channel> channelFiltered;
 
     public ChannelAdapter(Context context, ArrayList<Channel> channels) {
         this.allChannels = channels;
+        this.channelFiltered = (ArrayList<Channel>) channels.clone();
         this.context = context;
+    }
+
+
+    public void filter(String filtre){
+        channelFiltered.clear();
+
+        for (Channel oneChannel : allChannels) {
+            if(oneChannel.name.toLowerCase().contains(filtre.toLowerCase()))
+            {
+                channelFiltered.add(oneChannel);
+            }
+        }
+
+        notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return allChannels.size();
+        return channelFiltered.size();
     }
 
     @Override
     public Channel getItem(int position) {
-        return allChannels.get(position);
+        return channelFiltered.get(position);
     }
 
     @Override
@@ -47,10 +61,10 @@ public class ChannelAdapter extends BaseAdapter {
         TextView nameChannel = (TextView) rowView.findViewById(R.id.nameChannel);
         TextView nbUser = (TextView) rowView.findViewById(R.id.nbUser);
 
-        rowView.setTag(allChannels.get(position));
+        rowView.setTag(channelFiltered.get(position));
 
-        nameChannel.setText(allChannels.get(position).name);
-        nbUser.setText("Nombre d'utilisateurs connectés : " + allChannels.get(position).connectedusers);
+        nameChannel.setText(channelFiltered.get(position).name);
+        nbUser.setText("Nombre d'utilisateurs connectés : " + channelFiltered.get(position).connectedusers);
 
         return rowView;
     }

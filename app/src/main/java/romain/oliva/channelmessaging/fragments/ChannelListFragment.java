@@ -80,4 +80,10 @@ public class ChannelListFragment extends Fragment implements onWsRequestListener
         }
 
     }
+
+    public void search(String filtre){
+
+        ((ChannelAdapter) channelList.getAdapter()).filter(filtre);
+
+    }
 }

@@ -8,7 +8,7 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:name="romain.oliva.channelmessaging.fragments.ChannelListFragment"
-        android:id="@+id/ChannelListFragment_land_ID"
+        android:id="@+id/ChannelListFragment_ID"
         android:layout_gravity="right"
         tools:layout="@layout/activity_fragment_channellist" />
 
