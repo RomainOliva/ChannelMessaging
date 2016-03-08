@@ -16,10 +16,11 @@ import android.widget.AdapterView;
 
 import romain.oliva.channelmessaging.fragments.ChannelListFragment;
 import romain.oliva.channelmessaging.fragments.MessageFragment;
+import romain.oliva.channelmessaging.gps.GPSActivity;
 import romain.oliva.channelmessaging.gson.Channel;
 import romain.oliva.channelmessaging.network.onWsRequestListener;
 
-public class ChannelListActivity extends AppCompatActivity implements onWsRequestListener, AdapterView.OnItemClickListener, View.OnClickListener, SearchView.OnQueryTextListener {
+public class ChannelListActivity extends GPSActivity implements onWsRequestListener, AdapterView.OnItemClickListener, View.OnClickListener, SearchView.OnQueryTextListener {
 
 
     private static final int REQUEST_MESSAGES = 0;

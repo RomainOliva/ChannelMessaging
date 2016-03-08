@@ -1,15 +1,20 @@
 package romain.oliva.channelmessaging;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 
 import romain.oliva.channelmessaging.fragments.MessageFragment;
+import romain.oliva.channelmessaging.gps.GPSActivity;
 
 
-public class ChannelActivity  extends AppCompatActivity {
+public class ChannelActivity extends GPSActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

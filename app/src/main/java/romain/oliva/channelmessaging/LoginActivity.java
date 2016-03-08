@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import java.util.HashMap;
 
 import romain.oliva.channelmessaging.gson.ConnexionResponse;
+import romain.oliva.channelmessaging.gson.GetAccessTokenResponse;
 import romain.oliva.channelmessaging.network.NetworkResultProvider;
 import romain.oliva.channelmessaging.network.onWsRequestListener;
 
@@ -49,8 +50,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         if(theAccessToken != null)
         {
-            Intent I_News = new Intent(this,ChannelListActivity.class);
-            startActivity(I_News);
+            //List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+            //params.add(new BasicNameValuePair("username", txt_id.getText().toString()));
+            //params.add(new BasicNameValuePair("password", txt_mdp.getText().toString()));
+            HashMap<String, String> params = new HashMap<String, String>();
+            params.put("accesstoken", theAccessToken);
+
+            NetworkResultProvider np = new NetworkResultProvider(1, "isaccesstokenvalid", params);
+            np.setOnNewWsRequestListener(this);
+            np.execute();
         }
     }
 
@@ -77,29 +85,49 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onCompleted(int requestCode, String response) {
 
-        try{
-            Gson gson = new Gson();
-            ConnexionResponse myConnexionResponse = gson.fromJson(response, ConnexionResponse.class);
+        if(requestCode == 0)
+        {
+            try{
+                Gson gson = new Gson();
+                ConnexionResponse myConnexionResponse = gson.fromJson(response, ConnexionResponse.class);
 
-            if(myConnexionResponse.code == 200)
-            {
-                Toast.makeText(getApplicationContext(), myConnexionResponse.response, Toast.LENGTH_SHORT).show();
+                if(myConnexionResponse.code == 200)
+                {
+                    Toast.makeText(getApplicationContext(), myConnexionResponse.response, Toast.LENGTH_SHORT).show();
 
-                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString("accesstoken", myConnexionResponse.accesstoken);
+                    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("accesstoken", myConnexionResponse.accesstoken);
 
-                editor.commit();
+                    editor.commit();
 
-                Intent I_News = new Intent(this,ChannelListActivity.class);
-                startActivity(I_News);
+                    Intent I_News = new Intent(this,ChannelListActivity.class);
+                    startActivity(I_News);
+                }
+
+                if(myConnexionResponse.code == 500)
+                {
+                    Toast.makeText(getApplicationContext(), "Identifiants incorrect", Toast.LENGTH_SHORT).show();
+                }
+
             }
-
+            catch (Exception e) {
+                Log.w("JsonException", e.toString());
+            }
         }
-        catch (Exception e) {
-            Log.w("JsonException", e.toString());
+        else {
+            try {
+                Gson gson = new Gson();
+                GetAccessTokenResponse accessTokenResponse = gson.fromJson(response, GetAccessTokenResponse.class);
+
+                if (accessTokenResponse.code == 200) {
+                    Intent I_News = new Intent(this,ChannelListActivity.class);
+                    startActivity(I_News);
+                }
+            }
+            catch (Exception e) {
+                Log.w("JsonException", e.toString());
+            }
         }
-
-
     }
 }
