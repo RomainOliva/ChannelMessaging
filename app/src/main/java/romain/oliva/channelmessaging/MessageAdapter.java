@@ -17,6 +17,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,19 +80,26 @@ public class MessageAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        String filename = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+ "/" + allMessages.get(position).username + ".png";
+        String filename = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + allMessages.get(position).username + ".png";
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.custom_list_message, parent, false);
+        View rowView;
 
+        if (allMessages.get(position).messageImageUrl.equals("")) {
+            rowView = inflater.inflate(R.layout.custom_list_message, parent, false);
+        } else {
+            rowView = inflater.inflate(R.layout.custom_list_message_image, parent, false);
+        }
+
+        ImageView imageView = (ImageView) rowView.findViewById(R.id.imageView);
         TextView userName = (TextView) rowView.findViewById(R.id.userName);
         TextView msgText = (TextView) rowView.findViewById(R.id.msgText);
         TextView hourText = (TextView) rowView.findViewById(R.id.hourText);
         final ImageView userPhoto = (ImageView) rowView.findViewById(R.id.userPhoto);
 
+
         File file = new File(filename);
-        if(!file.exists())
-        {
+        if (!file.exists()) {
             ImageResultProvider np = new ImageResultProvider(requestCode, allMessages.get(position).imageUrl, filename);
             np.setOnNewImageRequestListener(new OnDownloadImage() {
                 @Override
@@ -108,13 +117,10 @@ public class MessageAdapter extends BaseAdapter {
             });
 
             np.execute();
-        }
-        else
-        {
+        } else {
             Bitmap pathName = BitmapFactory.decodeFile(filename);
 
-            if(pathName != null)
-            {
+            if (pathName != null) {
                 Bitmap finalImage = getRoundedCornerBitmap(pathName);
 
                 userPhoto.setImageBitmap(finalImage);
@@ -123,10 +129,18 @@ public class MessageAdapter extends BaseAdapter {
 
         rowView.setTag(allMessages.get(position));
 
+        if (!allMessages.get(position).messageImageUrl.equals("")) {
+            Picasso.with(context).load(allMessages.get(position).messageImageUrl).into(imageView);
+        }
+
         userName.setText(allMessages.get(position).username + " : ");
 
         hourText.setText(allMessages.get(position).date);
-        msgText.setText(allMessages.get(position).message);
+
+        if (allMessages.get(position).messageImageUrl.equals("")) {
+            msgText.setText(allMessages.get(position).message);
+        }
+
         return rowView;
     }
 }

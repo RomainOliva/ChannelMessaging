@@ -3,9 +3,11 @@ package romain.oliva.channelmessaging.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -69,6 +71,14 @@ public class MessageFragment  extends Fragment implements View.OnClickListener, 
     private boolean isActive;
     private Location mCurrentLocation;
 
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            refreshMessages();
+        }
+    };
+
     public int channel_ID =0;
 
     public static final String PREFS_NAME = "MyPrefsFile";
@@ -89,22 +99,18 @@ public class MessageFragment  extends Fragment implements View.OnClickListener, 
         btn_send.setOnClickListener(this);
         btn_send_photo.setOnClickListener(this);
 
-        final Handler handler = new Handler();
+        refreshMessages();
 
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                refreshMessages();
-                if(isActive)
-                    handler.postDelayed(this, 5000);
-
-
-            }
-        };
-        handler.post(r);
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter I_Resume = new IntentFilter("com.google.android.c2dm.intent.RECEIVE");
+
+        getActivity().registerReceiver(mMessageReceiver, I_Resume);
+    }
 
     @Override
     public void onDestroy() {
@@ -251,11 +257,13 @@ public class MessageFragment  extends Fragment implements View.OnClickListener, 
                     String theAccessToken = settings.getString("accesstoken", null);
 
                     List<NameValuePair> params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair("accesstoken", "value"));
-                    params.add(new BasicNameValuePair("channelid", "value"));
+                    params.add(new BasicNameValuePair("accesstoken", theAccessToken));
+                    params.add(new BasicNameValuePair("channelid", String.valueOf(channel_ID)));
 
                     UploadFileToServer uploadedFile = new UploadFileToServer(getContext(), imageUri, params, this);
                     uploadedFile.execute();
+
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -275,7 +283,12 @@ public class MessageFragment  extends Fragment implements View.OnClickListener, 
         {
             File f = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+ "/photo/");
             f.mkdirs();
-            String uri = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+ "/photo/test.jpg";
+            
+            String stringForUri = getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)+ "/photo/test.jpg";
+            File fileFromString = new File(stringForUri);
+
+            Uri uri = Uri.fromFile(fileFromString);
+
 
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //Création de l’appel à l’application appareil photo pour récupérer une image
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri); //Emplacement de l’image stockée

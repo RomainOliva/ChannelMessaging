@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="romain.oliva.channelmessaging">
 
+    <permission
+        android:name="romain.oliva.channelmessaging.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="romain.oliva.channelmessaging.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

@@ -8,12 +8,13 @@ public class Message {
     public String imageUrl;
     public double latitude;
     public double longitude;
+    public String messageImageUrl;
 
 
     public void Message() {
     }
 
-    public Message(int userID, String username, String message, String date, String imageUrl, double latitude, double longitude)
+    public Message(int userID, String username, String message, String date, String imageUrl, double latitude, double longitude, String messageImageUrl)
     {
         this.userID = userID;
         this.username = username;
@@ -22,5 +23,6 @@ public class Message {
         this.imageUrl = imageUrl;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.messageImageUrl = messageImageUrl;
     }
 }

@@ -19,9 +19,10 @@ import romain.oliva.channelmessaging.gson.ConnexionResponse;
 import romain.oliva.channelmessaging.gson.GetAccessTokenResponse;
 import romain.oliva.channelmessaging.network.NetworkResultProvider;
 import romain.oliva.channelmessaging.network.onWsRequestListener;
+import romain.oliva.channelmessaging.notification.NotificationActivity;
 
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener, onWsRequestListener {
+public class LoginActivity extends NotificationActivity implements View.OnClickListener, onWsRequestListener {
 
     private EditText txt_id;
     private EditText txt_mdp;
@@ -71,6 +72,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("username", txt_id.getText().toString());
         params.put("password", txt_mdp.getText().toString());
+        params.put("registrationid", getRegistrationId());
 
         NetworkResultProvider np = new NetworkResultProvider(CONNECT_REQUEST, "connect", params);
         np.setOnNewWsRequestListener(this);
