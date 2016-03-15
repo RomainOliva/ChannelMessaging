@@ -30,6 +30,21 @@ public class ChannelListActivity extends GPSActivity implements onWsRequestListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_channellist);
+
+        if(getIntent().getAction() != null)
+        {
+            String fromNotify = getIntent().getAction();
+
+            if(fromNotify.equals("fromNotify"))
+            {
+                int GoToChannel = getIntent().getIntExtra("GoToChannel", 0);
+
+                Intent I_News = new Intent(getApplicationContext(), ChannelActivity.class);
+                I_News.putExtra("channelID", GoToChannel);
+                startActivityForResult(I_News, REQUEST_MESSAGES);
+            }
+        }
+
     }
 
 
@@ -64,7 +79,7 @@ public class ChannelListActivity extends GPSActivity implements onWsRequestListe
 
         MessageFragment messageFragment = (MessageFragment) getSupportFragmentManager().findFragmentById(R.id.MessageFragment_land_ID);
 
-        if(resultCode == RESULT_OK)
+        if(resultCode == RESULT_OK && requestCode == REQUEST_MESSAGES)
         {
             int channel_ID = data.getIntExtra("channelID", 0);
 

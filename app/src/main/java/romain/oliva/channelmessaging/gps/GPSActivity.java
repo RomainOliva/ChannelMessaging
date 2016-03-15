@@ -98,7 +98,9 @@ public class GPSActivity extends AppCompatActivity implements GoogleApiClient.Co
     protected void onStop() {
         super.onStop();
 
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
     }
 
     @Override

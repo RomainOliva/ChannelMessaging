@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="?android:listPreferredItemHeightLarge">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:layout_width="60dp"
@@ -28,17 +28,16 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="8dp"
         android:layout_toRightOf="@id/userPhoto"
-        android:layout_toEndOf="@id/userPhoto"/>
+        android:layout_toEndOf="@id/userPhoto"
+        android:layout_below="@+id/imageView"/>
 
 
     <ImageView
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
-        android:layout_toEndOf="@+id/userName"
-        android:layout_alignTop="@+id/userName"
-        android:layout_toRightOf="@+id/userName"
-        android:layout_marginLeft="60dp" />
+        android:layout_toRightOf="@id/userPhoto"
+        android:layout_toEndOf="@id/userPhoto" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -47,8 +46,8 @@
         android:textSize="13sp"
         android:textColor="#a8a8a8"
         android:id="@+id/hourText"
-        android:layout_below="@+id/userName"
-        android:layout_alignLeft="@+id/userName"
-        android:layout_alignStart="@+id/userName" />
+        android:layout_toRightOf="@id/userPhoto"
+        android:layout_toEndOf="@id/userPhoto"
+        android:layout_below="@+id/userName" />
 
 </RelativeLayout>

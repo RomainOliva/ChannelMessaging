@@ -3,6 +3,9 @@ package romain.oliva.channelmessaging.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,16 +14,19 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.location.Location;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,9 +51,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import romain.oliva.channelmessaging.ChannelActivity;
 import romain.oliva.channelmessaging.ChannelListActivity;
+import romain.oliva.channelmessaging.LoginActivity;
 import romain.oliva.channelmessaging.MessageAdapter;
 import romain.oliva.channelmessaging.R;
 import romain.oliva.channelmessaging.gps.GPSActivity;
@@ -70,16 +78,20 @@ public class MessageFragment  extends Fragment implements View.OnClickListener, 
     private EditText sendMessage;
     private boolean isActive;
     private Location mCurrentLocation;
-
+    public int channel_ID = 0;
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            refreshMessages();
+
+            abortBroadcast();
+
+            if(intent.getStringExtra("channelid").equals(String.valueOf(channel_ID)))
+            {
+                refreshMessages();
+            }
         }
     };
-
-    public int channel_ID =0;
 
     public static final String PREFS_NAME = "MyPrefsFile";
 
@@ -108,8 +120,15 @@ public class MessageFragment  extends Fragment implements View.OnClickListener, 
     public void onResume() {
         super.onResume();
         IntentFilter I_Resume = new IntentFilter("com.google.android.c2dm.intent.RECEIVE");
+        I_Resume.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
 
         getActivity().registerReceiver(mMessageReceiver, I_Resume);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(mMessageReceiver);
     }
 
     @Override
@@ -212,9 +231,18 @@ public class MessageFragment  extends Fragment implements View.OnClickListener, 
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         final Message oneMessage = (Message) view.getTag();
 
-        String[] arr = new String[2];
-        arr[0] =  "Afficher sur la carte";
-        arr[1] =  "Ajouter en amis";
+        String [] arr;
+
+        if(oneMessage.message.equals(""))
+        {
+            arr = new String[1];
+            arr[0] =  "Ajouter en amis (not implement yet)";
+        }
+        else {
+            arr = new String[2];
+            arr[0] =  "Ajouter en amis (not implement yet)";
+            arr[1] =  "Afficher sur la carte";
+        }
 
         new AlertDialog.Builder(getActivity())
                 .setIcon(android.R.drawable.ic_dialog_alert)//drawable de l'icone à gauche du titre
@@ -222,7 +250,7 @@ public class MessageFragment  extends Fragment implements View.OnClickListener, 
                 .setItems(arr, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {//which = la position de l'item appuyé
-                        if (which == 0) {
+                        if (which == 1) {
                             Intent i = new Intent(getContext(), MapActivity.class);
                             i.putExtra("username", oneMessage.username);
                             i.putExtra("latitude", String.valueOf(oneMessage.latitude));

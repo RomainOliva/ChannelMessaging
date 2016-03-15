@@ -1,6 +1,8 @@
 package romain.oliva.channelmessaging;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -24,14 +26,23 @@ import romain.oliva.channelmessaging.notification.NotificationActivity;
 
 public class LoginActivity extends NotificationActivity implements View.OnClickListener, onWsRequestListener {
 
+    //TODO
+    //2. "Resolved" Pas de coordonnées GPS quand envoie photos
+    //3. "Resolved" Si on clique sur photo et on passe en landscape bug
+    //4. "Not time :p" Faire envoie de son
+    //5. "In Progress" Tp ergo
+    //6. "Resolved"   vibreur marche pas
+
     private EditText txt_id;
     private EditText txt_mdp;
-    private TextView lbl_id;
-    private TextView lbl_mdp;
     private Button btn_validate;
 
     private static final int CONNECT_REQUEST = 0;
     public static final String PREFS_NAME = "MyPrefsFile";
+
+    private static final int REQUEST_MESSAGES = 0;
+
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +51,6 @@ public class LoginActivity extends NotificationActivity implements View.OnClickL
 
         txt_id = (EditText) findViewById(R.id.txt_id);
         txt_mdp = (EditText) findViewById(R.id.txt_mdp);
-        lbl_id = (TextView) findViewById(R.id.lbl_id);
-        lbl_mdp = (TextView) findViewById(R.id.lbl_mdp);
         btn_validate = (Button) findViewById(R.id.btn_validate);
 
         btn_validate.setOnClickListener(this);
@@ -49,8 +58,17 @@ public class LoginActivity extends NotificationActivity implements View.OnClickL
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         String theAccessToken = settings.getString("accesstoken", null);
 
+
         if(theAccessToken != null)
         {
+
+            mDialog = new ProgressDialog(this);
+            mDialog.setMessage("Récupération du token...");
+            mDialog.setCancelable(false);
+            mDialog.setIndeterminate(true);
+
+            mDialog.show();
+
             //List<NameValuePair> params = new ArrayList<NameValuePair>(2);
             //params.add(new BasicNameValuePair("username", txt_id.getText().toString()));
             //params.add(new BasicNameValuePair("password", txt_mdp.getText().toString()));
@@ -60,6 +78,7 @@ public class LoginActivity extends NotificationActivity implements View.OnClickL
             NetworkResultProvider np = new NetworkResultProvider(1, "isaccesstokenvalid", params);
             np.setOnNewWsRequestListener(this);
             np.execute();
+
         }
     }
 
@@ -86,6 +105,12 @@ public class LoginActivity extends NotificationActivity implements View.OnClickL
 
     @Override
     public void onCompleted(int requestCode, String response) {
+
+
+        if(mDialog != null && mDialog.isShowing())
+        {
+            mDialog.hide();
+        }
 
         if(requestCode == 0)
         {
@@ -122,9 +147,23 @@ public class LoginActivity extends NotificationActivity implements View.OnClickL
                 Gson gson = new Gson();
                 GetAccessTokenResponse accessTokenResponse = gson.fromJson(response, GetAccessTokenResponse.class);
 
+
                 if (accessTokenResponse.code == 200) {
-                    Intent I_News = new Intent(this,ChannelListActivity.class);
-                    startActivity(I_News);
+                    String fromNotify = (String) getIntent().getAction();
+
+                    if(fromNotify.equals("fromNotify"))
+                    {
+                        int GoToChannel = Integer.valueOf((String) getIntent().getStringExtra("GoToChannel"));
+
+                        Intent I_News = new Intent(getApplicationContext(), ChannelListActivity.class);
+                        I_News.setAction("fromNotify");
+                        I_News.putExtra("GoToChannel", GoToChannel);
+                        startActivityForResult(I_News, REQUEST_MESSAGES);
+                    }
+                    else{
+                        Intent I_News = new Intent(this,ChannelListActivity.class);
+                        startActivity(I_News);
+                    }
                 }
             }
             catch (Exception e) {
